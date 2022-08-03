@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.utils.CoaxialSwerveModule;
 import frc.robot.utils.TractionControlController;
 import frc.robot.utils.TurnPIDController;
@@ -112,14 +113,18 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   public static Hardware initializeHardware(double wheelbase, double trackWidth) {
-    CoaxialSwerveModule lFrontModule = new CoaxialSwerveModule(CoaxialSwerveModule.initializeHardware(1, 2),
+    CoaxialSwerveModule lFrontModule = new CoaxialSwerveModule(CoaxialSwerveModule.initializeHardware(Constants.LF_DRIVE_MOTOR_PORT, Constants.LF_ROTATE_MOTOR_PORT, Constants.LF_ROTATE_ENCODER_PORT),
+                                                               Constants.ROTATE_MOTOR_CONFIG,
                                                                new Translation2d(+wheelbase / 2.0, +trackWidth / 2.0));
-    CoaxialSwerveModule rFrontModule = new CoaxialSwerveModule(CoaxialSwerveModule.initializeHardware(3, 4),
+    CoaxialSwerveModule rFrontModule = new CoaxialSwerveModule(CoaxialSwerveModule.initializeHardware(Constants.RF_DRIVE_MOTOR_PORT, Constants.RF_ROTATE_MOTOR_PORT, Constants.RF_ROTATE_ENCODER_PORT),
+                                                               Constants.ROTATE_MOTOR_CONFIG,
                                                                new Translation2d(+wheelbase / 2.0, -trackWidth / 2.0));
-    CoaxialSwerveModule lRearModule = new CoaxialSwerveModule(CoaxialSwerveModule.initializeHardware(5, 6),
-                                                               new Translation2d(-wheelbase / 2.0, +trackWidth / 2.0));
-    CoaxialSwerveModule rRearModule = new CoaxialSwerveModule(CoaxialSwerveModule.initializeHardware(7, 8),
-                                                               new Translation2d(-wheelbase / 2.0, -trackWidth / 2.0));
+    CoaxialSwerveModule lRearModule = new CoaxialSwerveModule(CoaxialSwerveModule.initializeHardware(Constants.LR_DRIVE_MOTOR_PORT, Constants.LR_ROTATE_MOTOR_PORT, Constants.LR_ROTATE_ENCODER_PORT),
+                                                              Constants.ROTATE_MOTOR_CONFIG,
+                                                              new Translation2d(-wheelbase / 2.0, +trackWidth / 2.0));
+    CoaxialSwerveModule rRearModule = new CoaxialSwerveModule(CoaxialSwerveModule.initializeHardware(Constants.RR_DRIVE_MOTOR_PORT, Constants.RR_ROTATE_MOTOR_PORT, Constants.RR_ROTATE_ENCODER_PORT),
+                                                              Constants.ROTATE_MOTOR_CONFIG,
+                                                              new Translation2d(-wheelbase / 2.0, -trackWidth / 2.0));
     Hardware drivetrainHardware = new Hardware(lFrontModule, rFrontModule, lRearModule, rRearModule, new AHRS(SPI.Port.kMXP));
 
     return drivetrainHardware;
