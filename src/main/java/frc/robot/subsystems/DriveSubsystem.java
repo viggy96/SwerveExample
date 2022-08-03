@@ -135,10 +135,10 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
     SwerveModuleState[] moduleStates = m_kinematics.toSwerveModuleStates(new ChassisSpeeds(velocityX, velocityY, Math.toRadians(rotateRate)));
 
     // Set modules to calculated states
-    m_lFrontModule.set(moduleStates[m_lFrontModule.locationIndex.value]);
-    m_rFrontModule.set(moduleStates[m_rFrontModule.locationIndex.value]);
-    m_lRearModule.set(moduleStates[m_lRearModule.locationIndex.value]);
-    m_rRearModule.set(moduleStates[m_rRearModule.locationIndex.value]);
+    m_lFrontModule.set(moduleStates);
+    m_rFrontModule.set(moduleStates);
+    m_lRearModule.set(moduleStates);
+    m_rRearModule.set(moduleStates);
   }
 
   @Override

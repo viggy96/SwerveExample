@@ -104,6 +104,14 @@ public class CoaxialSwerveModule implements AutoCloseable {
   }
 
   /**
+   * Set swerve module direction and speed
+   * @param states array of states for all swerve modules
+   */
+  public void set(SwerveModuleState[] states) {
+    set(states[locationIndex.value]);
+  }
+
+  /**
    * Reset swerve module to 0 degrees
    */
   public void reset() {
