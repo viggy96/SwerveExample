@@ -130,12 +130,7 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
     return drivetrainHardware;
   }
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
-
-  public void teleop(double velocityX, double velocityY, double rotateRate) {
+  private void drive(double velocityX, double velocityY, double rotateRate) {
     // Convert speeds to module states
     SwerveModuleState[] moduleStates = m_kinematics.toSwerveModuleStates(new ChassisSpeeds(velocityX, velocityY, Math.toRadians(rotateRate)));
 
@@ -144,6 +139,35 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
     m_rFrontModule.set(moduleStates);
     m_lRearModule.set(moduleStates);
     m_rRearModule.set(moduleStates);
+  }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+  }
+
+  public void teleopPID(double xRequest, double yRequest, double turnRequest) {
+    double velocityX = m_tractionControlController.throttleLookup(xRequest);
+    double velocityY = m_tractionControlController.throttleLookup(yRequest);
+    double rotateRate = m_turnPIDController.calculate(getAngle(), getTurnRate(), turnRequest);
+
+    drive(velocityX, velocityY, rotateRate);
+  }
+
+  /**
+   * Get DriveSubsystem orientation
+   * @return orientation in degrees
+   */
+  public double getAngle() {
+    return m_navx.getAngle();
+  }
+
+  /**
+   * Get DriveSubsystem turn rate
+   * @return turn rate in degrees per second
+   */
+  public double getTurnRate() {
+    return m_navx.getRate();
   }
 
   @Override

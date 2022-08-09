@@ -83,4 +83,15 @@ public class TractionControlController {
 
     return m_tractionControlMap.get(velocityLookup);
   }
+
+  /**
+   * Lookup linear speed corresponding to user throttle
+   * @param inputLookup Input value in percent
+   * @return Velocity in m/s
+   */
+  public double throttleLookup(double inputLookup) {
+    inputLookup = Math.copySign(Math.floor(Math.abs(inputLookup) * 1000) / 1000, inputLookup) + 0.0;
+    
+    return m_throttleInputMap.get(inputLookup);
+  }
 }
