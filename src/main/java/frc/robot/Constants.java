@@ -21,6 +21,9 @@ public final class Constants {
     public static final String RIO_CAN_BUS = "rio";
     public static final String CANIVORE_CAN_BUS = "canivore";
 
+    public static final double DRIVE_GEAR_RATIO = 1.0;
+    public static final double DRIVE_WHEEL_DIAMETER_METERS = 0.1524;
+
     public static final int LF_DRIVE_MOTOR_PORT = 0;
     public static final int LF_ROTATE_MOTOR_PORT = 1;
     public static final int LF_ROTATE_ENCODER_PORT = 2;

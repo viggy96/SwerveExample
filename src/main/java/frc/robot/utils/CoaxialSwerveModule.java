@@ -51,14 +51,19 @@ public class CoaxialSwerveModule implements AutoCloseable {
   public final Translation2d moduleLocation;
   public final LocationIndex locationIndex;
 
+  public final double driveGearRatio;
+  public final double driveWheelDiameter;
+
   private static TractionControlController m_tractionControlController;
 
-  public CoaxialSwerveModule(Hardware swerveHardware, TalonPIDConfig rotateMotorConfig, Translation2d moduleLocation) {
+  public CoaxialSwerveModule(Hardware swerveHardware, TalonPIDConfig rotateMotorConfig, Translation2d moduleLocation, double driveGearRatio, double driveWheelDiameter) {
     this.driveMotor = swerveHardware.driveMotor;
     this.rotateMotor = swerveHardware.rotateMotor;
     this.rotateEncoder = swerveHardware.rotateEncoder;
     this.rotateMotorConfig = rotateMotorConfig;
     this.moduleLocation = moduleLocation;
+    this.driveGearRatio = driveGearRatio;
+    this.driveWheelDiameter = driveWheelDiameter;
 
     driveMotor.configFactoryDefault();
     rotateMotor.configFactoryDefault();
@@ -123,6 +128,18 @@ public class CoaxialSwerveModule implements AutoCloseable {
    */
   public void set(SwerveModuleState[] states) {
     set(states[locationIndex.value]);
+  }
+
+  /**
+   * Get velocity of drive wheel
+   * @return velocity of drive wheel in m/s
+   */
+  public double getDriveVelocity() {
+    return driveMotor.getSelectedSensorVelocity() * (10.0 / 2048.0) * driveGearRatio * driveWheelDiameter * Math.PI;
+  }
+
+  public SwerveModuleState getState() {
+    return new SwerveModuleState(driveMotor.getSelectedSensorVelocity(), new Rotation2d(rotateEncoder.getPosition()));
   }
 
   /**

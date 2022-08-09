@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.time.Instant;
+
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
@@ -115,16 +117,24 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
   public static Hardware initializeHardware(double wheelbase, double trackWidth) {
     CoaxialSwerveModule lFrontModule = new CoaxialSwerveModule(CoaxialSwerveModule.initializeHardware(Constants.LF_DRIVE_MOTOR_PORT, Constants.LF_ROTATE_MOTOR_PORT, Constants.LF_ROTATE_ENCODER_PORT),
                                                                Constants.ROTATE_MOTOR_CONFIG,
-                                                               new Translation2d(+wheelbase / 2.0, +trackWidth / 2.0));
+                                                               new Translation2d(+wheelbase / 2.0, +trackWidth / 2.0),
+                                                               Constants.DRIVE_GEAR_RATIO, 
+                                                               Constants.DRIVE_WHEEL_DIAMETER_METERS);
     CoaxialSwerveModule rFrontModule = new CoaxialSwerveModule(CoaxialSwerveModule.initializeHardware(Constants.RF_DRIVE_MOTOR_PORT, Constants.RF_ROTATE_MOTOR_PORT, Constants.RF_ROTATE_ENCODER_PORT),
                                                                Constants.ROTATE_MOTOR_CONFIG,
-                                                               new Translation2d(+wheelbase / 2.0, -trackWidth / 2.0));
+                                                               new Translation2d(+wheelbase / 2.0, -trackWidth / 2.0),
+                                                               Constants.DRIVE_GEAR_RATIO, 
+                                                               Constants.DRIVE_WHEEL_DIAMETER_METERS);
     CoaxialSwerveModule lRearModule = new CoaxialSwerveModule(CoaxialSwerveModule.initializeHardware(Constants.LR_DRIVE_MOTOR_PORT, Constants.LR_ROTATE_MOTOR_PORT, Constants.LR_ROTATE_ENCODER_PORT),
                                                               Constants.ROTATE_MOTOR_CONFIG,
-                                                              new Translation2d(-wheelbase / 2.0, +trackWidth / 2.0));
+                                                              new Translation2d(-wheelbase / 2.0, +trackWidth / 2.0),
+                                                              Constants.DRIVE_GEAR_RATIO, 
+                                                              Constants.DRIVE_WHEEL_DIAMETER_METERS);
     CoaxialSwerveModule rRearModule = new CoaxialSwerveModule(CoaxialSwerveModule.initializeHardware(Constants.RR_DRIVE_MOTOR_PORT, Constants.RR_ROTATE_MOTOR_PORT, Constants.RR_ROTATE_ENCODER_PORT),
                                                               Constants.ROTATE_MOTOR_CONFIG,
-                                                              new Translation2d(-wheelbase / 2.0, -trackWidth / 2.0));
+                                                              new Translation2d(-wheelbase / 2.0, -trackWidth / 2.0),
+                                                              Constants.DRIVE_GEAR_RATIO, 
+                                                              Constants.DRIVE_WHEEL_DIAMETER_METERS);
     Hardware drivetrainHardware = new Hardware(lFrontModule, rFrontModule, lRearModule, rRearModule, new AHRS(SPI.Port.kMXP));
 
     return drivetrainHardware;
@@ -146,12 +156,34 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
     // This method will be called once per scheduler run
   }
 
+  /**
+   * Call this repeatedly to drive using PID during teleoperation
+   * @param xRequest x-axis request [-1.0, +1.0]
+   * @param yRequest y-axis request [-1.0, +1.0]
+   * @param turnRequest turn request [-1.0, +1.0]
+   */
   public void teleopPID(double xRequest, double yRequest, double turnRequest) {
     double velocityX = m_tractionControlController.throttleLookup(xRequest);
     double velocityY = m_tractionControlController.throttleLookup(yRequest);
     double rotateRate = m_turnPIDController.calculate(getAngle(), getTurnRate(), turnRequest);
 
     drive(velocityX, velocityY, rotateRate);
+  }
+
+  /**
+   * Update DriveSubsystem odometry
+   */
+  public void updateOdometry() {
+    // Get current state of all swerve modules
+    SwerveModuleState[] currentStates = {
+      m_lFrontModule.getState(),
+      m_rFrontModule.getState(),
+      m_lRearModule.getState(),
+      m_rRearModule.getState()
+    };
+
+    // Update odometry with time, which allows for taking loop time into account
+    m_odometry.updateWithTime(Instant.now().getEpochSecond(), m_navx.getRotation2d(), currentStates);
   }
 
   /**
