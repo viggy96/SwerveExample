@@ -135,11 +135,12 @@ public class CoaxialSwerveModule implements AutoCloseable {
    * @return velocity of drive wheel in m/s
    */
   public double getDriveVelocity() {
+    // Convert from ticks per 100ms to m/s
     return driveMotor.getSelectedSensorVelocity() * (10.0 / 2048.0) * driveGearRatio * driveWheelDiameter * Math.PI;
   }
 
   public SwerveModuleState getState() {
-    return new SwerveModuleState(driveMotor.getSelectedSensorVelocity(), new Rotation2d(rotateEncoder.getPosition()));
+    return new SwerveModuleState(getDriveVelocity(), new Rotation2d(rotateEncoder.getPosition()));
   }
 
   /**
