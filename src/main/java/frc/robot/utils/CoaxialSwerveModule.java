@@ -65,23 +65,30 @@ public class CoaxialSwerveModule implements AutoCloseable {
     this.driveGearRatio = driveGearRatio;
     this.driveWheelDiameter = driveWheelDiameter;
 
+    // Reset devices to defaults
     driveMotor.configFactoryDefault();
     rotateMotor.configFactoryDefault();
     rotateEncoder.configFactoryDefault();
 
+    // Seed encoder position method
     rotateEncoder.setPositionToAbsolute();
 
+    // Enable brake mode
     driveMotor.setNeutralMode(NeutralMode.Brake);
     rotateMotor.setNeutralMode(NeutralMode.Brake);
 
+    // Set drive motor to use integrated encoder
     driveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 
+    // Set motor deadband
     driveMotor.configNeutralDeadband(MOTOR_DEADBAND);
     rotateMotor.configNeutralDeadband(MOTOR_DEADBAND);
 
+    // Enable voltage compensation on drive motor
     driveMotor.configVoltageCompSaturation(MAX_VOLTAGE);
     driveMotor.enableVoltageCompensation(true);
 
+    // Set rotate motor to use CANCoder
     rotateMotor.configRemoteFeedbackFilter(rotateEncoder, 0);
     rotateMotorConfig.initializeTalonPID(rotateMotor, FeedbackDevice.RemoteSensor0);
 
@@ -140,7 +147,7 @@ public class CoaxialSwerveModule implements AutoCloseable {
   }
 
   public SwerveModuleState getState() {
-    return new SwerveModuleState(getDriveVelocity(), new Rotation2d(rotateEncoder.getPosition()));
+    return new SwerveModuleState(getDriveVelocity(), new Rotation2d(Math.toRadians(rotateEncoder.getPosition())));
   }
 
   /**
