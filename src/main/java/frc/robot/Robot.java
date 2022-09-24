@@ -19,6 +19,10 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+  public Robot() {
+    super(Constants.ROBOT_LOOP_PERIOD);
+  }
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -66,7 +70,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    m_robotContainer.autonomousPeriodic();
+  }
 
   @Override
   public void teleopInit() {

@@ -11,6 +11,7 @@ import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -151,6 +152,17 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
     m_rRearModule.set(moduleStates);
   }
 
+  private void resetAngle() {
+    m_navx.reset();
+  }
+
+  private void resetEncoders() {
+    m_lFrontModule.resetDriveEncoder();
+    m_rFrontModule.resetDriveEncoder();
+    m_lRearModule.resetDriveEncoder();
+    m_rRearModule.resetDriveEncoder();
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -168,6 +180,15 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
     double rotateRate = m_turnPIDController.calculate(getAngle(), getTurnRate(), turnRequest);
 
     drive(velocityX, velocityY, rotateRate);
+  }
+
+  /**
+   * Reset DriveSubsystem odometry
+   */
+  public void resetOdometry(Pose2d pose) {
+    resetAngle();
+    resetEncoders();
+    m_odometry.resetPosition(pose, getRotation2d());
   }
 
   /**
@@ -192,6 +213,14 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
    */
   public double getAngle() {
     return m_navx.getAngle();
+  }
+
+  /**
+   * Get DriveSubsystem orientation
+   * @return orientation as Rotation2d object
+   */
+  public Rotation2d getRotation2d() {
+    return m_navx.getRotation2d();
   }
 
   /**

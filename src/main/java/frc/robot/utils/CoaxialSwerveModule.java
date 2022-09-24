@@ -151,6 +151,20 @@ public class CoaxialSwerveModule implements AutoCloseable {
   }
 
   /**
+   * Reset drive motor encoder
+   */
+  public void resetDriveEncoder() {
+    driveMotor.setSelectedSensorPosition(0.0);
+  }
+
+  /**
+   * Reset rotate motor encoder
+   */
+  public void resetRotateEncoder() {
+    rotateMotor.setSelectedSensorPosition(0.0);
+  }
+
+  /**
    * Reset swerve module to 0 degrees
    */
   public void reset() {

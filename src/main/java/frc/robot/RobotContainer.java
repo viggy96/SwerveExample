@@ -6,9 +6,9 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.robot.subsystems.DriveSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -17,15 +17,32 @@ import edu.wpi.first.wpilibj2.command.Command;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private static final DriveSubsystem DRIVE_SUBSYSTEM = new DriveSubsystem(DriveSubsystem.initializeHardware(Constants.WHEELBASE, Constants.TRACK_WIDTH),
+                                                                           Constants.DRIVE_kP,
+                                                                           Constants.DRIVE_kD,
+                                                                           Constants.DRIVE_TURN_SCALAR,
+                                                                           Constants.CONTROLLER_DEADBAND,
+                                                                           Constants.DRIVE_LOOKAHEAD,
+                                                                           Constants.DRIVE_METERS_PER_TICK,
+                                                                           Constants.DRIVE_MAX_LINEAR_SPEED,
+                                                                           Constants.DRIVE_TRACTION_CONTROL_CURVE,
+                                                                           Constants.DRIVE_THROTTLE_INPUT_CURVE,
+                                                                           Constants.DRIVE_TURN_INPUT_CURVE,
+                                                                           Constants.DRIVE_CURRENT_LIMIT_CONFIGURATION);
 
-  private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
+  private static final XboxController PRIMARY_CONTROLLER = new XboxController(Constants.PRIMARY_CONTROLLER_PORT);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+
+    DRIVE_SUBSYSTEM.setDefaultCommand(
+      new RunCommand(
+        () -> DRIVE_SUBSYSTEM.teleopPID(PRIMARY_CONTROLLER.getLeftY(), PRIMARY_CONTROLLER.getLeftX(), PRIMARY_CONTROLLER.getRightX()), 
+        DRIVE_SUBSYSTEM
+      )
+    );
   }
 
   /**
@@ -37,12 +54,19 @@ public class RobotContainer {
   private void configureButtonBindings() {}
 
   /**
+   * Tasks to do periodically in autonomous
+   */
+  public void autonomousPeriodic() {
+    DRIVE_SUBSYSTEM.updateOdometry();
+  }
+
+  /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_autoCommand;
+    return null;
   }
 }
